@@ -5,7 +5,7 @@ import Header from './components/header/header.component';
 import SignInAndSignUpPage from './pages/sign-in-and-sign-up/sign-in-and-sign-up.component';
 import {Route} from 'react-router-dom';
 import {Switch} from 'react-router-dom';
-import {auth} from './firebase/firebase.utils';
+import {auth, createUserProfileDocument} from './firebase/firebase.utils';
 import React from 'react';
 
 const HatsPage = () => (
@@ -26,9 +26,29 @@ class App extends React.Component {
   unsubscribeFromAuth = null;
 
   componentDidMount() {
-    this.unsubscribeFromAuth = auth.onAuthStateChanged(user => {
-      this.setState({currentUser: user});
-      console.log(user);
+    this.unsubscribeFromAuth = auth.onAuthStateChanged(async userAuth => {
+      // Check if the user signed in
+      if (userAuth) {
+        //If so, set the state to contain the user details
+        const userRef = await createUserProfileDocument(userAuth);
+
+        userRef.onSnapshot(snapShot => {
+          this.setState({
+            currentUser: {
+              id: snapShot.id,
+              ...snapShot.data()
+            }
+          })
+
+          console.log(this.state);
+        });
+      }
+      else {
+        //Otherwise, set it to null (userAuth is null in this case)
+        this.setState({
+          currentUser: userAuth
+        });
+      }
     });
   }
 
