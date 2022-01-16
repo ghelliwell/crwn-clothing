@@ -30,7 +30,7 @@ const config = {
                 createdAt,
                 ...additionalData
             })
-            console.log('Creating user');
+            console.log('Creating user');   
         }
         catch (error) {
             console.log('Error creating user', error.message);
